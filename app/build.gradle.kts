@@ -29,13 +29,14 @@ android {
     }
 
     defaultConfig {
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
         buildConfigField("String", "GIT_VERSION", "\"" + androidGitVersion.name() + "\"")
 
         // minSdk = 23
         minSdk = 29
-        targetSdk = 35
+        // targetSdk = 35
+        targetSdk = 34
 
         applicationId = "willemw12.simpletask"
 
