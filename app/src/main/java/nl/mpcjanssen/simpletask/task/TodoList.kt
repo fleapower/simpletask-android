@@ -315,6 +315,12 @@ class TodoList(val config: Config) {
                             )
                             TodoApplication.app.switchTodoFile(File(newFile))
                         }
+                        // --- Google Drive Sync after successful local save ---
+                        try {
+                            TodoApplication.app.syncCurrentFileToDrive(TodoApplication.app)
+                        } catch (e: Exception) {
+                            Log.e(tag, "Drive sync after save failed", e)
+                        }
                     } catch (e: Exception) {
                         Log.e(tag, "TodoList save to ${todoFile.path} failed", e)
                         config.changesPending = true
