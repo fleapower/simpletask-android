@@ -52,4 +52,9 @@
         android:key="@string/task_drag"
         android:summary="@string/task_drag_summary"
         android:title="@string/task_drag_title" />
+    <CheckBoxPreference
+        android:key="pref_google_drive_integration"
+        android:title="@string/pref_google_drive_integration_title"
+        android:summary="@string/pref_google_drive_integration_summary"
+        android:defaultValue="false" />
 </PreferenceScreen>

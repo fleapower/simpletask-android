@@ -567,7 +567,7 @@ class Simpletask : ThemedNoActionBarActivity() {
     @SuppressLint("Recycle")
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menu.add(0, 1001, 0, "Sync with Google Drive")
-        menu.add(0, 1002, 1, "Sign in to Google Drive")
+        
         Log.i(TAG, "Recreating options menu")
         this.options_menu = menu
 
