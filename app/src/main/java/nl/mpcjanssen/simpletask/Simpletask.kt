@@ -333,6 +333,9 @@ class Simpletask : ThemedNoActionBarActivity() {
         handleIntent()
         Log.i(TAG, "onResume <- handleIntent")
         uiHandler.forEvent(Event.RESUME)
+
+        // Trigger Google Drive sync on resume
+        TodoApplication.app.syncCurrentFileToDrive(this)
     }
 
     override fun onSearchRequested(): Boolean {
