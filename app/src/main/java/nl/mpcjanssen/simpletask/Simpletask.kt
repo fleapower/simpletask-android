@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.provider.CalendarContract
 import android.provider.CalendarContract.Events
 import android.util.Log
+import nl.mpcjanssen.simpletask.drive.DriveSync
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.webkit.MimeTypeMap
@@ -46,7 +47,6 @@ import nl.mpcjanssen.simpletask.databinding.MainBinding
 import nl.mpcjanssen.simpletask.remote.FileStore
 import nl.mpcjanssen.simpletask.task.*
 import nl.mpcjanssen.simpletask.util.*
-import nl.mpcjanssen.simpletask.drive.DriveSync
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
@@ -54,6 +54,22 @@ import kotlin.text.toInt
 import android.R.id as androidId
 
 class Simpletask : ThemedNoActionBarActivity() {
+    @Suppress("DEPRECATION")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 9001) { // RC_SIGN_IN from DriveSync
+            DriveSync.handleSignInResult(this, data,
+                onSuccess = {
+                    showToastShort(this, "Google Drive sign-in successful!")
+                    Log.i(TAG, "Google Drive sign-in successful")
+                },
+                onError = { e ->
+                    showToastLong(this, "Google Drive sign-in failed: ${e.localizedMessage}")
+                    Log.e(TAG, "Google Drive sign-in failed", e)
+                }
+            )
+        }
+    }
     companion object {
         private const val REQUEST_PREFERENCES = 1
 
