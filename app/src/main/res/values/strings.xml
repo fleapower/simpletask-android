@@ -427,4 +427,8 @@ You should have received a copy of the GNU General Public License along with Tod
     <string name="pin_notification">Pin as notification</string>
     <string name="channel_name">Pin notifications</string>
     <string name="channel_description">Channel for tasks pinned as notifications</string>
+    <string name="pref_google_drive_integration_title">Enable Google Drive Integration</string>
+    <string name="pref_google_drive_integration_summary">Sync tasks with Google Drive. Sign in or out when toggled.</string>
+    <string name="signing_in_google_drive">Signing in to Google Drive...</string>
+    <string name="signed_out_google_drive">Signed out of Google Drive.</string>
 </resources>

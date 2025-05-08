@@ -82,4 +82,6 @@
         android:key="debug_info"
         android:summary="@string/preference_summary_debug_info"
         android:title="@string/preference_title_debug_info" />
+
+
 </PreferenceScreen>

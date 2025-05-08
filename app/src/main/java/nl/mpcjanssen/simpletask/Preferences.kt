@@ -27,6 +27,8 @@
  */
 package nl.mpcjanssen.simpletask
 
+import nl.mpcjanssen.simpletask.drive.DriveSync
+
 import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
@@ -34,6 +36,7 @@ import android.os.Bundle
 import android.preference.*
 import android.util.Log
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -207,6 +210,30 @@ class Preferences : ThemedPreferenceActivity(), SharedPreferences.OnSharedPrefer
                 preference.summary = getString(R.string.share_task_append_text_summary)
                 preference.valueInSummary(any)
                 true
+            }
+
+            // Google Drive integration checkbox
+            val drivePref = findPreference("pref_google_drive_integration") as CheckBoxPreference?
+            drivePref?.let { pref ->
+                var initialized = false
+                pref.setOnPreferenceChangeListener { _, newValue ->
+                    if (!initialized) {
+                        initialized = true
+                        return@setOnPreferenceChangeListener true
+                    }
+                    val checked = newValue as Boolean
+                    if (checked) {
+                        // Trigger Google sign-in
+                        DriveSync.signIn(activity!!)
+                        Toast.makeText(activity, activity!!.getString(R.string.signing_in_google_drive), Toast.LENGTH_SHORT).show()
+                    } else {
+                        // Trigger Google sign-out
+                        DriveSync.signOut(activity!!) {
+                            Toast.makeText(activity, activity!!.getString(R.string.signed_out_google_drive), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    true
+                }
             }
         }
     }
