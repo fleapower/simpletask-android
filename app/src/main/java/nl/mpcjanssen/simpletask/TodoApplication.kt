@@ -318,9 +318,11 @@ class TodoApplication : Application() {
             todoFile.name,
             onSuccess = {
                 Log.i(TAG, "Manual sync: File uploaded to Google Drive: ${todoFile.name}")
+                nl.mpcjanssen.simpletask.util.showToastShort(context, "Sync to Google Drive successful!")
             },
             onError = {
                 Log.e(TAG, "Manual sync: Failed to upload to Google Drive", it)
+                nl.mpcjanssen.simpletask.util.showToastShort(context, "Sync to Google Drive failed: ${it.localizedMessage}")
             }
         )
     }
