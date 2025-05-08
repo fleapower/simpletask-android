@@ -76,14 +76,33 @@ object DriveSync {
         }
         Thread {
             try {
-                val fileMetadata = com.google.api.services.drive.model.File()
-                fileMetadata.name = driveFileName
+                // Search for an existing file with the same name
+                val result = driveService!!.files().list()
+                    .setQ("name = '${driveFileName.replace("'", "\\'")}' and trashed = false")
+                    .setSpaces("drive")
+                    .setFields("files(id, name)")
+                    .execute()
+                val files = result.files
                 val fileContent = FileInputStream(localFile)
                 val mediaContent = com.google.api.client.http.InputStreamContent("text/plain", fileContent)
-                val file = driveService!!.files().create(fileMetadata, mediaContent)
-                    .setFields("id")
-                    .execute()
-                Log.i("DriveSync", "File uploaded with ID: ${file.id}")
+                if (files != null && files.isNotEmpty()) {
+                    // File exists, update it
+                    val fileId = files[0].id
+                    val updatedFile = com.google.api.services.drive.model.File()
+                    updatedFile.name = driveFileName
+                    driveService!!.files().update(fileId, updatedFile, mediaContent)
+                        .setFields("id")
+                        .execute()
+                    Log.i("DriveSync", "File updated with ID: $fileId")
+                } else {
+                    // File does not exist, create it
+                    val fileMetadata = com.google.api.services.drive.model.File()
+                    fileMetadata.name = driveFileName
+                    val file = driveService!!.files().create(fileMetadata, mediaContent)
+                        .setFields("id")
+                        .execute()
+                    Log.i("DriveSync", "File uploaded with ID: ${file.id}")
+                }
                 fileContent.close()
                 onSuccess()
             } catch (e: Exception) {
