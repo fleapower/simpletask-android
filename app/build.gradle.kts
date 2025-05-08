@@ -6,6 +6,7 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+
 android {
     compileSdk = 35
     flavorDimensions += "main"
@@ -83,6 +84,12 @@ android {
 }
 
 dependencies {
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation("com.google.api-client:google-api-client-android:1.35.0")
+    implementation("com.google.api-client:google-api-client-gson:1.35.0")
+    implementation("com.google.http-client:google-http-client-gson:1.43.3")
+    implementation(files("libs/google-api-services-drive-v3-rev197-1.25.0.jar"))
+    // Optional: Use the Play Services Drive API for easier Drive file operations on Android
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference)
     implementation(libs.androidx.recyclerview)

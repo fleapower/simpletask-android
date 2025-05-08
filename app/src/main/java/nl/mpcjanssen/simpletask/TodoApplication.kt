@@ -195,6 +195,22 @@ class TodoApplication : Application() {
         } else {
             config.setTodoFile(newTodo)
             loadTodoList("from file switch")
+            // Start Google Drive sync after switching file
+            try {
+                nl.mpcjanssen.simpletask.drive.DriveSync.uploadFile(
+                    this,
+                    newTodo,
+                    newTodo.name,
+                    onSuccess = {
+                        Log.i(TAG, "File uploaded to Google Drive: ${newTodo.name}")
+                    },
+                    onError = {
+                        Log.e(TAG, "Failed to upload to Google Drive", it)
+                    }
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "Drive upload error", e)
+            }
         }
     }
 
@@ -288,6 +304,25 @@ class TodoApplication : Application() {
             getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
         // }
+    }
+
+    fun startDriveSignIn(activity: Activity) {
+        nl.mpcjanssen.simpletask.drive.DriveSync.signIn(activity)
+    }
+
+    fun syncCurrentFileToDrive(context: Context) {
+        val todoFile = config.todoFile
+        nl.mpcjanssen.simpletask.drive.DriveSync.uploadFile(
+            context,
+            todoFile,
+            todoFile.name,
+            onSuccess = {
+                Log.i(TAG, "Manual sync: File uploaded to Google Drive: ${todoFile.name}")
+            },
+            onError = {
+                Log.e(TAG, "Manual sync: Failed to upload to Google Drive", it)
+            }
+        )
     }
 
     companion object {

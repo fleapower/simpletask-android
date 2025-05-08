@@ -46,6 +46,7 @@ import nl.mpcjanssen.simpletask.databinding.MainBinding
 import nl.mpcjanssen.simpletask.remote.FileStore
 import nl.mpcjanssen.simpletask.task.*
 import nl.mpcjanssen.simpletask.util.*
+import nl.mpcjanssen.simpletask.drive.DriveSync
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
@@ -544,6 +545,8 @@ class Simpletask : ThemedNoActionBarActivity() {
     // @RequiresApi(Build.VERSION_CODES.M)
     @SuppressLint("Recycle")
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menu.add(0, 1001, 0, "Sync with Google Drive")
+        menu.add(0, 1002, 1, "Sign in to Google Drive")
         Log.i(TAG, "Recreating options menu")
         this.options_menu = menu
 
@@ -879,6 +882,21 @@ class Simpletask : ThemedNoActionBarActivity() {
 
     // @RequiresApi(Build.VERSION_CODES.M)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            1001 -> {
+                // Sync current file to Google Drive
+                TodoApplication.app.syncCurrentFileToDrive(this)
+                showToastShort(this, "Syncing with Google Drive...")
+                return true
+            }
+            1002 -> {
+                // Trigger Google Drive sign-in
+                TodoApplication.app.startDriveSignIn(this)
+                showToastShort(this, "Signing in to Google Drive...")
+                return true
+            }
+        }
+
         Log.i(TAG, "onMenuItemSelected: " + item.itemId)
         val checkedTasks = TodoApplication.todoList.selectedTasks
         when (item.itemId) {
