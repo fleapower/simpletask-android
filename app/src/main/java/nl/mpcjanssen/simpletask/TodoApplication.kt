@@ -323,6 +323,10 @@ class TodoApplication : Application() {
             onError = {
                 Log.e(TAG, "Manual sync: Two-way sync with Google Drive failed", it)
                 nl.mpcjanssen.simpletask.util.showToastShort(context, "Two-way sync failed: ${it.localizedMessage}")
+            },
+            onDriveNewer = {
+                // Only called if Drive file is newer and local file was overwritten
+                loadTodoList("Reload after Drive newer during sync")
             }
         )
     }

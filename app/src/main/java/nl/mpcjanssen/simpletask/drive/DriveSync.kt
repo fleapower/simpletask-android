@@ -139,7 +139,8 @@ object DriveSync {
         localFile: File,
         driveFileName: String,
         onSuccess: () -> Unit,
-        onError: (Exception) -> Unit
+        onError: (Exception) -> Unit,
+        onDriveNewer: (() -> Unit)? = null // called if Drive file is newer
     ) {
         if (driveService == null) {
             onError(Exception("Not signed in to Google Drive"))
@@ -166,6 +167,7 @@ object DriveSync {
                         driveService!!.files().get(driveFileId).executeMediaAndDownloadTo(outputStream)
                         outputStream.close()
                         Log.i("DriveSync", "Drive file was newer, downloaded to local.")
+                        onDriveNewer?.invoke()
                     } else if (localModified > driveModified) {
                         // Local is newer, upload
                         val fileContent = FileInputStream(localFile)
