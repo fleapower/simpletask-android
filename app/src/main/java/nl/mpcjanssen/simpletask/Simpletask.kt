@@ -100,6 +100,9 @@ class Simpletask : ThemedNoActionBarActivity() {
         Log.i(TAG, "onCreate")
         m_savedInstanceState = savedInstanceState
 
+        // Ensure DriveSync is initialized if already signed in
+        DriveSync.ensureInitialized(this)
+
         val intentFilter = IntentFilter()
         intentFilter.addAction(Constants.BROADCAST_ACTION_LOGOUT)
         intentFilter.addAction(Constants.BROADCAST_AUTH_FAILED)
@@ -323,6 +326,8 @@ class Simpletask : ThemedNoActionBarActivity() {
         super.onResume()
 
         Log.i(TAG, "onResume")
+        // Re-initialize DriveSync if already signed in
+        DriveSync.ensureInitialized(this)
         TodoApplication.todoList.reload(reason = "Main activity resume")
         Log.i(TAG, "onResume -> handleIntent")
         handleIntent()
