@@ -128,4 +128,74 @@ object DriveSync {
             }
         }.start()
     }
+
+    /**
+     * Two-way sync: if the Drive file is newer, download it and overwrite the local file.
+     * If the local file is newer, upload it and overwrite the Drive file.
+     * If both are the same, do nothing.
+     */
+    fun syncTwoWay(
+        context: Context,
+        localFile: File,
+        driveFileName: String,
+        onSuccess: () -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        if (driveService == null) {
+            onError(Exception("Not signed in to Google Drive"))
+            return
+        }
+        Thread {
+            try {
+                // Get Drive file metadata
+                val result = driveService!!.files().list()
+                    .setQ("name = '${driveFileName.replace("'", "\\'")}' and trashed = false")
+                    .setSpaces("drive")
+                    .setFields("files(id, name, modifiedTime)")
+                    .execute()
+                val files = result.files
+                val driveFile = files?.firstOrNull()
+                val driveModified = driveFile?.modifiedTime?.value ?: 0L
+                val localModified = localFile.lastModified()
+
+                if (driveFile != null) {
+                    if (driveModified > localModified) {
+                        // Drive is newer, download
+                        val driveFileId = driveFile.id
+                        val outputStream = FileOutputStream(localFile)
+                        driveService!!.files().get(driveFileId).executeMediaAndDownloadTo(outputStream)
+                        outputStream.close()
+                        Log.i("DriveSync", "Drive file was newer, downloaded to local.")
+                    } else if (localModified > driveModified) {
+                        // Local is newer, upload
+                        val fileContent = FileInputStream(localFile)
+                        val mediaContent = com.google.api.client.http.InputStreamContent("text/plain", fileContent)
+                        val updatedFile = com.google.api.services.drive.model.File()
+                        updatedFile.name = driveFileName
+                        driveService!!.files().update(driveFile.id, updatedFile, mediaContent)
+                            .setFields("id")
+                            .execute()
+                        fileContent.close()
+                        Log.i("DriveSync", "Local file was newer, uploaded to Drive.")
+                    } else {
+                        Log.i("DriveSync", "Files are in sync, no action taken.")
+                    }
+                } else {
+                    // No Drive file exists, upload local as new
+                    val fileMetadata = com.google.api.services.drive.model.File()
+                    fileMetadata.name = driveFileName
+                    val fileContent = FileInputStream(localFile)
+                    val mediaContent = com.google.api.client.http.InputStreamContent("text/plain", fileContent)
+                    driveService!!.files().create(fileMetadata, mediaContent)
+                        .setFields("id")
+                        .execute()
+                    fileContent.close()
+                    Log.i("DriveSync", "No Drive file, uploaded local file as new.")
+                }
+                onSuccess()
+            } catch (e: Exception) {
+                onError(e)
+            }
+        }.start()
+    }
 }
