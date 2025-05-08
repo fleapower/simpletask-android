@@ -20,6 +20,27 @@ import java.io.FileOutputStream
 import java.util.Collections
 
 object DriveSync {
+    /**
+     * Ensure DriveSync is initialized with the last signed-in account, if available.
+     * This allows staying logged in between app restarts.
+     */
+    fun ensureInitialized(context: Context) {
+        if (driveService != null && account != null && credential != null) return
+        val lastAccount = GoogleSignIn.getLastSignedInAccount(context)
+        if (lastAccount != null) {
+            account = lastAccount
+            credential = GoogleAccountCredential.usingOAuth2(
+                context, Collections.singleton(DriveScopes.DRIVE_FILE)
+            )
+            credential!!.selectedAccount = account!!.account
+            val transport = GoogleNetHttpTransport.newTrustedTransport()
+            val jsonFactory = GsonFactory.getDefaultInstance()
+            driveService = Drive.Builder(transport, jsonFactory, credential)
+                .setApplicationName("Simpletask")
+                .build()
+            Log.i("DriveSync", "DriveSync initialized from last signed-in account.")
+        }
+    }
     private const val RC_SIGN_IN = 9001
     private var googleSignInClient: GoogleSignInClient? = null
     private var driveService: Drive? = null
