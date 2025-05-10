@@ -215,12 +215,7 @@ class Preferences : ThemedPreferenceActivity(), SharedPreferences.OnSharedPrefer
             // Google Drive integration checkbox
             val drivePref = findPreference("pref_google_drive_integration") as CheckBoxPreference?
             drivePref?.let { pref ->
-                var initialized = false
                 pref.setOnPreferenceChangeListener { _, newValue ->
-                    if (!initialized) {
-                        initialized = true
-                        return@setOnPreferenceChangeListener true
-                    }
                     val checked = newValue as Boolean
                     if (checked) {
                         // Trigger Google sign-in

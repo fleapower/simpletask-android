@@ -52,6 +52,14 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("D:/GitHub_Repos/KeyStore for Releases/Simpletask_Release.jks")
+            storePassword = "fBefihcx4CtcF8oL!hkVz@w"
+            keyAlias = "SimpletaskKey"
+            keyPassword = "fBefihcx4CtcF8oL!hkVz@w"
+        }
+    }
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
@@ -59,9 +67,9 @@ android {
             // manifestPlaceholders["providerBuildType"] = "debug"
         }
         release {
+            applicationIdSuffix = ".release"
             versionNameSuffix = " (Simpletask fork)"
-
-            // signingConfig signingConfigs.release
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
