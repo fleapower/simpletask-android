@@ -97,9 +97,27 @@ object DriveSync {
         }
         Thread {
             try {
-                // Search for an existing file with the same name
+                // Find or create ToDoTxt folder
+                val folderResult = driveService!!.files().list()
+                    .setQ("name = 'ToDoTxt' and mimeType = 'application/vnd.google-apps.folder' and trashed = false")
+                    .setSpaces("drive")
+                    .setFields("files(id, name)")
+                    .execute()
+                val folders = folderResult.files
+                val folderId = if (folders != null && folders.isNotEmpty()) {
+                    folders[0].id
+                } else {
+                    val folderMetadata = com.google.api.services.drive.model.File()
+                    folderMetadata.name = "ToDoTxt"
+                    folderMetadata.mimeType = "application/vnd.google-apps.folder"
+                    val folder = driveService!!.files().create(folderMetadata)
+                        .setFields("id")
+                        .execute()
+                    folder.id
+                }
+                // Search for an existing file with the same name in ToDoTxt
                 val result = driveService!!.files().list()
-                    .setQ("name = '${driveFileName.replace("'", "\\'")}' and trashed = false")
+                    .setQ("name = '${driveFileName.replace("'", "\\'")}' and trashed = false and '${folderId}' in parents")
                     .setSpaces("drive")
                     .setFields("files(id, name)")
                     .execute()
@@ -119,6 +137,7 @@ object DriveSync {
                     // File does not exist, create it
                     val fileMetadata = com.google.api.services.drive.model.File()
                     fileMetadata.name = driveFileName
+                    fileMetadata.parents = listOf(folderId)
                     val file = driveService!!.files().create(fileMetadata, mediaContent)
                         .setFields("id")
                         .execute()
@@ -169,9 +188,27 @@ object DriveSync {
         }
         Thread {
             try {
-                // Get Drive file metadata
+                // Find or create ToDoTxt folder
+                val folderResult = driveService!!.files().list()
+                    .setQ("name = 'ToDoTxt' and mimeType = 'application/vnd.google-apps.folder' and trashed = false")
+                    .setSpaces("drive")
+                    .setFields("files(id, name)")
+                    .execute()
+                val folders = folderResult.files
+                val folderId = if (folders != null && folders.isNotEmpty()) {
+                    folders[0].id
+                } else {
+                    val folderMetadata = com.google.api.services.drive.model.File()
+                    folderMetadata.name = "ToDoTxt"
+                    folderMetadata.mimeType = "application/vnd.google-apps.folder"
+                    val folder = driveService!!.files().create(folderMetadata)
+                        .setFields("id")
+                        .execute()
+                    folder.id
+                }
+                // Get Drive file metadata in ToDoTxt
                 val result = driveService!!.files().list()
-                    .setQ("name = '${driveFileName.replace("'", "\\'")}' and trashed = false")
+                    .setQ("name = '${driveFileName.replace("'", "\\'")}' and trashed = false and '${folderId}' in parents")
                     .setSpaces("drive")
                     .setFields("files(id, name, modifiedTime)")
                     .execute()
@@ -207,6 +244,7 @@ object DriveSync {
                     // No Drive file exists, upload local as new
                     val fileMetadata = com.google.api.services.drive.model.File()
                     fileMetadata.name = driveFileName
+                    fileMetadata.parents = listOf(folderId)
                     val fileContent = FileInputStream(localFile)
                     val mediaContent = com.google.api.client.http.InputStreamContent("text/plain", fileContent)
                     driveService!!.files().create(fileMetadata, mediaContent)
