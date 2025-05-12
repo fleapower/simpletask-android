@@ -196,20 +196,22 @@ class TodoApplication : Application() {
             config.setTodoFile(newTodo)
             loadTodoList("from file switch")
             // Start Google Drive sync after switching file
-            try {
-                nl.mpcjanssen.simpletask.drive.DriveSync.uploadFile(
-                    this,
-                    newTodo,
-                    newTodo.name,
-                    onSuccess = {
-                        Log.i(TAG, "File uploaded to Google Drive: ${newTodo.name}")
-                    },
-                    onError = {
-                        Log.e(TAG, "Failed to upload to Google Drive", it)
-                    }
-                )
-            } catch (e: Exception) {
-                Log.e(TAG, "Drive upload error", e)
+            if (config.isGoogleDriveEnabled) {
+                try {
+                    nl.mpcjanssen.simpletask.drive.DriveSync.uploadFile(
+                        this,
+                        newTodo,
+                        newTodo.name,
+                        onSuccess = {
+                            Log.i(TAG, "File uploaded to Google Drive: ${newTodo.name}")
+                        },
+                        onError = {
+                            Log.e(TAG, "Failed to upload to Google Drive", it)
+                        }
+                    )
+                } catch (e: Exception) {
+                    Log.e(TAG, "Drive upload error", e)
+                }
             }
         }
     }
@@ -311,24 +313,26 @@ class TodoApplication : Application() {
     }
 
     fun syncCurrentFileToDrive(context: Context) {
-        val todoFile = config.todoFile
-        nl.mpcjanssen.simpletask.drive.DriveSync.syncTwoWay(
-            context,
-            todoFile,
-            todoFile.name,
-            onSuccess = {
-                Log.i(TAG, "Manual sync: Two-way sync with Google Drive successful for ${todoFile.name}")
-                nl.mpcjanssen.simpletask.util.showToastShort(context, "Two-way sync with Google Drive successful!")
-            },
-            onError = {
-                Log.e(TAG, "Manual sync: Two-way sync with Google Drive failed", it)
-                nl.mpcjanssen.simpletask.util.showToastShort(context, "Two-way sync failed: ${it.localizedMessage}")
-            },
-            onDriveNewer = {
-                // Only called if Drive file is newer and local file was overwritten
-                loadTodoList("Reload after Drive newer during sync")
-            }
-        )
+        if (config.isGoogleDriveEnabled) {
+            val todoFile = config.todoFile
+            nl.mpcjanssen.simpletask.drive.DriveSync.syncTwoWay(
+                context,
+                todoFile,
+                todoFile.name,
+                onSuccess = {
+                    Log.i(TAG, "Manual sync: Two-way sync with Google Drive successful for ${todoFile.name}")
+                    //nl.mpcjanssen.simpletask.util.showToastShort(context, "Two-way sync with Google Drive successful!")
+                },
+                onError = {
+                    Log.e(TAG, "Manual sync: Two-way sync with Google Drive failed", it)
+                    nl.mpcjanssen.simpletask.util.showToastShort(context, "Two-way sync failed: ${it.localizedMessage}")
+                },
+                onDriveNewer = {
+                    // Only called if Drive file is newer and local file was overwritten
+                    loadTodoList("Reload after Drive newer during sync")
+                }
+            )
+        }
     }
 
     companion object {

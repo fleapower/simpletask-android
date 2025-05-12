@@ -10,6 +10,9 @@ import java.io.File
 import java.util.*
 
 class Config(app: TodoApplication) : Preferences(app) {
+    val isGoogleDriveEnabled: Boolean
+        get() = prefs.getBoolean("pref_google_drive_integration", false)
+
     val TAG = "Config"
 
     init {
