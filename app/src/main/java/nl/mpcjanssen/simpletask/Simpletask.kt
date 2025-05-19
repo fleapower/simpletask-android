@@ -328,7 +328,8 @@ class Simpletask : ThemedNoActionBarActivity() {
         Log.i(TAG, "onResume")
         // Re-initialize DriveSync if already signed in
         DriveSync.ensureInitialized(this)
-        TodoApplication.todoList.reload(reason = "Main activity resume")
+        // Don't reload todoList on resume
+        // TodoApplication.todoList.reload(reason = "Main activity resume")
         Log.i(TAG, "onResume -> handleIntent")
         handleIntent()
         Log.i(TAG, "onResume <- handleIntent")

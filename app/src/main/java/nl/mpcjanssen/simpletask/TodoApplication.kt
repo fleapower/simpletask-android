@@ -34,6 +34,7 @@ import android.app.AlarmManager
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import nl.mpcjanssen.simpletask.drive.DriveSync
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.*
@@ -307,27 +308,38 @@ class TodoApplication : Application() {
     }
 
     fun startDriveSignIn(activity: Activity) {
-        nl.mpcjanssen.simpletask.drive.DriveSync.signIn(activity)
+        DriveSync.signIn(activity)
     }
 
     fun syncCurrentFileToDrive(context: Context) {
         val todoFile = config.todoFile
-        nl.mpcjanssen.simpletask.drive.DriveSync.syncTwoWay(
+        val originalContent = todoFile.readText()
+        val originalChecksum = originalContent.hashCode()
+        
+        DriveSync.syncTwoWay(
             context,
             todoFile,
             todoFile.name,
             onSuccess = {
-                Log.i(TAG, "Manual sync: Two-way sync with Google Drive successful for ${todoFile.name}")
-                nl.mpcjanssen.simpletask.util.showToastShort(context, "Two-way sync with Google Drive successful!")
+                val newContent = todoFile.readText()
+                val newChecksum = newContent.hashCode()
+                
+                if (originalChecksum != newChecksum) {
+                    Log.i(TAG, "File changed during sync, reloading...")
+                    loadTodoList("Reload after Drive sync with changes")
+                } else {
+                    Log.i(TAG, "No changes detected after sync")
+                }
+                Log.i(TAG, "Two-way sync with Google Drive successful for ${todoFile.name}")
             },
-            onError = {
-                Log.e(TAG, "Manual sync: Two-way sync with Google Drive failed", it)
-                nl.mpcjanssen.simpletask.util.showToastShort(context, "Two-way sync failed: ${it.localizedMessage}")
+            onError = { error ->
+                Log.e(TAG, "Two-way sync with Google Drive failed", error)
+                nl.mpcjanssen.simpletask.util.showToastShort(context, "Two-way sync failed: ${error.localizedMessage}")
             },
-            onDriveNewer = {
-                // Only called if Drive file is newer and local file was overwritten
-                loadTodoList("Reload after Drive newer during sync")
-            }
+            // onDriveNewer = {
+            // Only called if Drive file is newer and local file was overwritten
+            // loadTodoList("Reload after Drive newer during sync")
+            // }
         )
     }
 
