@@ -158,11 +158,20 @@ object DriveSync {
         }
         Thread {
             try {
-                val outputStream = FileOutputStream(localFile)
-                driveService!!.files().get(driveFileId).executeMediaAndDownloadTo(outputStream)
-                outputStream.close()
-                Log.i("DriveSync", "File downloaded to: ${localFile.absolutePath}")
-                onSuccess()
+                val tempFile = File.createTempFile("download", null, localFile.parentFile)
+                try {
+                    val outputStream = FileOutputStream(tempFile)
+                    driveService!!.files().get(driveFileId).executeMediaAndDownloadTo(outputStream)
+                    outputStream.close()
+                    // Only replace the original file if download succeeded
+                    if (localFile.exists()) localFile.delete()
+                    tempFile.renameTo(localFile)
+                    Log.i("DriveSync", "File downloaded to: ${localFile.absolutePath}")
+                    onSuccess()
+                } catch (e: Exception) {
+                    tempFile.delete()
+                    throw e
+                }
             } catch (e: Exception) {
                 onError(e)
             }
@@ -221,11 +230,20 @@ object DriveSync {
                     if (driveModified > localModified) {
                         // Drive is newer, download
                         val driveFileId = driveFile.id
-                        val outputStream = FileOutputStream(localFile)
-                        driveService!!.files().get(driveFileId).executeMediaAndDownloadTo(outputStream)
-                        outputStream.close()
-                        Log.i("DriveSync", "Drive file was newer, downloaded to local.")
-                        onDriveNewer?.invoke()
+                        val tempFile = File.createTempFile("download", null, localFile.parentFile)
+                        try {
+                            val outputStream = FileOutputStream(tempFile)
+                            driveService!!.files().get(driveFileId).executeMediaAndDownloadTo(outputStream)
+                            outputStream.close()
+                            // Only replace the original file if download succeeded
+                            if (localFile.exists()) localFile.delete()
+                            tempFile.renameTo(localFile)
+                            Log.i("DriveSync", "Drive file was newer, downloaded to local.")
+                            onDriveNewer?.invoke()
+                        } catch (e: Exception) {
+                            tempFile.delete()
+                            throw e
+                        }
                     } else if (localModified > driveModified) {
                         // Local is newer, upload
                         val fileContent = FileInputStream(localFile)
