@@ -1,13 +1,11 @@
-Simpletask (fork)
-=================
+Simpletask Google Drive (fork)
+==============================
 
-This [app](https://github.com/willemw12/simpletask-android) is a fork of the deprecated [Simpletask](https://github.com/mpcjanssen/simpletask-android) Android app.
+This [app](https://github.com/fleapower/simpletask-android) is a fork of [Simpletask](https://github.com/willemw12/simpletask-android) was forked from the deprecated [Simpletask](https://github.com/mpcjanssen/simpletask-android) Android app.
 
-An APK file is available from the [releases](https://github.com/willemw12/simpletask-android/releases) page.
+This version supports Google Drive sync, but you will need to set up a Google project and compile it yourself (detailed instructions will be forthcoming).
 
-Only the Cloudless version is supported and mainly only core features are supported.
-
-The original text follows below.
+Applicable portions of the original text follow below.
 
 
 Simpletask
@@ -20,9 +18,6 @@ Simpletask is a simple task manager for Android, based on the brilliant [todo.tx
   * [Documentation](#documentation)
   * [Translation](#translation)
   * [Cloudless Version](#cloudless-version)
-  * [Nextcloud Version](#nextcloud-version)
-  * [WebDAV Version](#webdav-version)
-  * [Dropbox](#dropbox)
 
 ## Documentation
 
@@ -45,23 +40,3 @@ Cloudless stores tasks in a todo.txt file on the device. A separate app (such as
 
 Because the todo.txt file could be anywhere on the device to allow sync by a different app, the Cloudless version
 requests full storage access. This is unfortunately the only way to make common use case work while staying sane.
-
-## Nextcloud Version
-
-<a href="https://f-droid.org/repository/browse/?fdid=nl.mpcjanssen.simpletask.nextcloud" target="_blank">
-<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80"/></a>
-
-
-Nextcloud stores tasks in a todo.txt file using Nextcloud.
-
-## WebDAV Version
-
-<a href="https://f-droid.org/repository/browse/?fdid=nl.mpcjanssen.simpletask.webdav" target="_blank">
-<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80"/></a>
-
-
-Nextcloud stores tasks in a todo.txt file on any WebDAV server.
-
-## Dropbox
-
-The Dropbox version is not available from F-Droid. You can download builds of the different versions from: https://mpcjanssen.nl/artifacts/
