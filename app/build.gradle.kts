@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -54,10 +57,19 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("D:/GitHub_Repos/KeyStore for Releases/Simpletask_Release.jks")
-            storePassword = "fBefihcx4CtcF8oL!hkVz@w"
-            keyAlias = "SimpletaskKey"
-            keyPassword = "fBefihcx4CtcF8oL!hkVz@w"
+            val keystoreProperties = Properties()
+            val keystorePropertiesFile = rootProject.file("local.properties")
+            if (keystorePropertiesFile.exists()) {
+                keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+            }
+
+            val storeFilePath = keystoreProperties.getProperty("storeFile")
+            if (storeFilePath != null) {
+                storeFile = file(storeFilePath)
+            }
+            storePassword = keystoreProperties.getProperty("storePassword")
+            keyAlias = keystoreProperties.getProperty("keyAlias")
+            keyPassword = keystoreProperties.getProperty("keyPassword")
         }
     }
     buildTypes {
